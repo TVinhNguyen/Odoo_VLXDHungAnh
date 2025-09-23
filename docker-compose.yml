@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  odoo:
+    image: odoo:${ODOO_VERSION}
+    restart: unless-stopped
+    ports:
+      - "8069:8069"
+    # Nếu máy bạn có vấn đề DNS, bỏ comment 4 dòng dưới:
+    # dns:
+    #   - 8.8.8.8
+    #   - 1.1.1.1
+    volumes:
+      - ./addons:/mnt/extra-addons
+      - ./config/odoo.conf:/etc/odoo/odoo.conf
+      - odoo-data:/var/lib/odoo
+
+volumes:
+  odoo-data:

@@ -1,17 +1,41 @@
 version: "3.9"
 
 services:
-  odoo:
-    image: odoo:${ODOO_VERSION}
+  db:
+    image: postgres:13
     restart: unless-stopped
-    user: "0:0"  # Run as root to avoid permission issues
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U odoo"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  odoo:
+    image: odoo:${ODOO_VERSION:-16.0}
+    restart: unless-stopped
+    user: "0:0" # keep to avoid permission issues when mounting local volumes
     ports:
       - "8069:8069"
-    # Nếu máy bạn có vấn đề DNS, bỏ comment 4 dòng dưới:
-    dns:
-      - 8.8.8.8
-      - 1.1.1.1
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # These help Odoo connect to the local Postgres service if config uses env vars
+      PGHOST: db
+      PGUSER: odoo
+      PGPASSWORD: odoo
+      PGDATABASE: postgres
     volumes:
       - ./addons:/mnt/extra-addons
-      - ./config/odoo.conf:/etc/odoo/odoo.conf
+      - ./config/odoo.conf:/etc/odoo/odoo.conf:ro
       - ./odoo-data:/var/lib/odoo
+
+volumes:
+  odoo-db-data:
+    driver: local

@@ -1,1 +1,26 @@
 .env
+
+# Odoo filestore - chứa file tạm, sessions, cache
+odoo-data/filestore/
+odoo-data/sessions/
+odoo-data/.local/
+
+# Logs
+*.log
+odoo-data/*.log
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# File lỗi tạm thời
+loi.md

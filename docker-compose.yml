@@ -13,7 +13,4 @@ services:
     volumes:
       - ./addons:/mnt/extra-addons
       - ./config/odoo.conf:/etc/odoo/odoo.conf
-      - odoo-data:/var/lib/odoo
-
-volumes:
-  odoo-data:
+      - ./odoo-data:/var/lib/odoo

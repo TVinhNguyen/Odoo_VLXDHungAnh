@@ -1,11 +1,10 @@
 version: "3.9"
-
 services:
   db:
     image: postgres:13
     restart: unless-stopped
     environment:
-      POSTGRES_DB: postgres
+      POSTGRES_DB: odoo
       POSTGRES_USER: odoo
       POSTGRES_PASSWORD: odoo
     volumes:
@@ -17,24 +16,27 @@ services:
       retries: 5
 
   odoo:
-    image: odoo:${ODOO_VERSION:-16.0}
+    image: odoo:${ODOO_VERSION:-18.0}
     restart: unless-stopped
-    user: "0:0" # keep to avoid permission issues when mounting local volumes
     ports:
       - "8069:8069"
     depends_on:
       db:
         condition: service_healthy
     environment:
-      # These help Odoo connect to the local Postgres service if config uses env vars
-      PGHOST: db
-      PGUSER: odoo
-      PGPASSWORD: odoo
-      PGDATABASE: postgres
+      HOST: db
+      USER: odoo
+      PASSWORD: odoo
     volumes:
       - ./addons:/mnt/extra-addons
       - ./config/odoo.conf:/etc/odoo/odoo.conf:ro
       - ./odoo-data:/var/lib/odoo
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8069/web/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 volumes:
   odoo-db-data:

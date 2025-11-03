@@ -4,12 +4,13 @@ services:
   odoo:
     image: odoo:${ODOO_VERSION}
     restart: unless-stopped
+    user: "0:0"  # Run as root to avoid permission issues
     ports:
       - "8069:8069"
     # Nếu máy bạn có vấn đề DNS, bỏ comment 4 dòng dưới:
-    # dns:
-    #   - 8.8.8.8
-    #   - 1.1.1.1
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     volumes:
       - ./addons:/mnt/extra-addons
       - ./config/odoo.conf:/etc/odoo/odoo.conf
